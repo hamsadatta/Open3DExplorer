@@ -23,10 +23,12 @@
 #include<algorithm>
 #include<fstream>
 #include<chrono>
-
+#include <unistd.h>
 #include<opencv2/core/core.hpp>
 
 #include<System.h>
+
+#define CV_LOAD_IMAGE_UNCHANGED -1
 
 using namespace std;
 
@@ -88,7 +90,7 @@ int main(int argc, char **argv)
             return 1;
         }
 
-#ifdef COMPILEDWITHC11
+#ifdef COMPILEDWITHC14
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
         std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
@@ -97,7 +99,7 @@ int main(int argc, char **argv)
         // Pass the image to the SLAM system
         SLAM.TrackRGBD(imRGB,imD,tframe);
 
-#ifdef COMPILEDWITHC11
+#ifdef COMPILEDWITHC14
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
         std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();

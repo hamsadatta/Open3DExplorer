@@ -66,7 +66,7 @@ terrain_mapping::~terrain_mapping(){
 
 void terrain_mapping::Init_Height_deviation_map(Eigen::Vector3d cur_position_){
     // init projected 2D map:
-  Height_deviation_map.header.frame_id = "/world";
+  Height_deviation_map.header.frame_id = "world";
   Height_deviation_map.header.stamp = ros::Time::now();
 
   Height_deviation_map.info.width = int(Map_range*2/_octree->getResolution()) + 1;
@@ -87,7 +87,7 @@ void terrain_mapping::Init_Height_deviation_map(Eigen::Vector3d cur_position_){
 
 void terrain_mapping::Init_Height_map(Eigen::Vector3d cur_position_){
     // init projected 2D map:
-  Height_map.header.frame_id = "/world";
+  Height_map.header.frame_id = "world";
   Height_map.header.stamp = ros::Time::now();
 
   Height_map.info.width = int(Map_range*2/_octree->getResolution()) + 1;
@@ -109,7 +109,7 @@ void terrain_mapping::Init_Height_map(Eigen::Vector3d cur_position_){
 
 void terrain_mapping::Init_Slope_map(Eigen::Vector3d cur_position_){
     // init projected 2D map:
-  Slope_map.header.frame_id = "/world";
+  Slope_map.header.frame_id = "world";
   Slope_map.header.stamp = ros::Time::now();
 
   Slope_map.info.width = int(Map_range*2/_octree->getResolution()) + 1;
@@ -130,7 +130,7 @@ void terrain_mapping::Init_Slope_map(Eigen::Vector3d cur_position_){
 
 void terrain_mapping::Init_Curvature_map(Eigen::Vector3d cur_position_){
     // init projected 2D map:
-  Curvature_map.header.frame_id = "/world";
+  Curvature_map.header.frame_id = "world";
   Curvature_map.header.stamp = ros::Time::now();
 
   Curvature_map.info.width = int(Map_range*2/_octree->getResolution()) + 1;

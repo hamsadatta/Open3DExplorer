@@ -95,7 +95,7 @@ void publishAdaptiveOctree_Marker()
   // occupiedNodesVis.markers.resize(octomapSize);
   visualization_msgs::Marker cube_marker;
   
-  cube_marker.header.frame_id = "/world";
+  cube_marker.header.frame_id = "world";
   cube_marker.header.stamp = ros::Time::now();
   cube_marker.action = visualization_msgs::Marker::ADD;
   cube_marker.type = visualization_msgs::Marker::CUBE_LIST;

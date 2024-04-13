@@ -14,3 +14,5 @@ launch_sim.md
 # src/realsense_gazebo_plugin/
 # src/realsense_ros_gazebo/
 # src/semantic_slam/
+hsr_gazebo/
+ *.pyc

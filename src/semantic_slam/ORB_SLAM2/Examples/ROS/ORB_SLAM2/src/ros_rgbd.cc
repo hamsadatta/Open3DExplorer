@@ -117,8 +117,8 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/camera/color/image_raw", 1);
-    message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/camera/aligned_depth_to_color/image_raw", 1);
+    message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/hsrb/head_rgbd_sensor/rgb/image_raw", 1);
+    message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/hsrb/head_rgbd_sensor/depth_registered/image_raw", 1);
     
     // message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/d435i/aligned_depth_to_color/image_raw", 1);
     // message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/d435i/color/image_raw", 1);

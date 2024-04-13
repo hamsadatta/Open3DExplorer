@@ -96,7 +96,7 @@ def train(args):
     #model = get_model(model_name, n_classes, version = args.dataset+'_res101')
     if do_finetuning:
         # pspnet pretrained on ade20k
-        pretrained_model_path = '/home/hitwzh/semantic_slam_ws/src/semantic_slam/models/pspnet_50_ade20k.pth'
+        pretrained_model_path = '/home/hamsadatta/test/thesis/catkin_ws/src/Open3DExplorer/src/semantic_slam/models/pspnet_50_ade20k.pth'
         # pspnet pretrained on pascal VOC
         #pretrained_model_path = '/home/hitwzh/semantic_slam_ws/src/semantic_slam/models/pspnet_101_pascalvoc.pth'
         pretrained_state = convert_state_dict(torch.load(pretrained_model_path)['model_state']) # remove 'module' in keys

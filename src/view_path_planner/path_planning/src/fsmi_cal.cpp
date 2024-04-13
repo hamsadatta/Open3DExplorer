@@ -271,7 +271,7 @@ void visualize_frontier(const vector<Eigen::Vector2i> frontier2d_vector){
   visualization_msgs::Marker fp_points;
   visualization_msgs::Marker text_marker;
 
-  fp_points.header.frame_id = "/world";
+  fp_points.header.frame_id = "world";
   fp_points.header.stamp = ros::Time::now();
   fp_points.ns = "points_and_lines";
   fp_points.action = visualization_msgs::Marker::ADD;
@@ -279,7 +279,7 @@ void visualize_frontier(const vector<Eigen::Vector2i> frontier2d_vector){
   // fp_points.type = visualization_msgs::Marker::POINTS;
   fp_points.type = visualization_msgs::Marker::CUBE;
   
-  text_marker.header.frame_id = "/world";
+  text_marker.header.frame_id = "world";
   text_marker.header.stamp = ros::Time::now();
   text_marker.ns = "points_and_lines";
   text_marker.action = visualization_msgs::Marker::ADD;

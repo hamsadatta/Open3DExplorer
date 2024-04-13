@@ -1,9 +1,8 @@
-<sdf version='1.6'>
+<sdf version='1.7'>
   <model name='example_track_simple_wheels'>
     <link name='body'>
-      <pose frame=''>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose frame=''>-0.058333 0 0 0 -0 0</pose>
+        <pose>-0.058333 0 0 0 -0 0</pose>
         <mass>1.2</mass>
         <inertia>
           <ixx>0.0296633</ixx>
@@ -15,7 +14,7 @@
         </inertia>
       </inertial>
       <collision name='body_collision'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
             <size>0.51 0.5 0.2</size>
@@ -23,7 +22,7 @@
         </geometry>
       </collision>
       <collision name='body_fixed_joint_lump__idler_collision_1'>
-        <pose frame=''>-0.35 0 0 1.5708 -0 0</pose>
+        <pose>-0.35 0 0 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.51</length>
@@ -32,7 +31,7 @@
         </geometry>
       </collision>
       <visual name='body_visual'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
             <size>0.5 0.51 0.2</size>
@@ -40,7 +39,7 @@
         </geometry>
       </visual>
       <visual name='body_fixed_joint_lump__idler_visual_1'>
-        <pose frame=''>-0.35 0 0 1.5708 -0 0</pose>
+        <pose>-0.35 0 0 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.51</length>
@@ -49,10 +48,26 @@
         </geometry>
       </visual>
     </link>
+    <joint name='sprocket_axle' type='revolute'>
+      <pose relative_to='body'>0.35 0 0 0 -0 0</pose>
+      <parent>body</parent>
+      <child>sprocket</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
     <link name='sprocket'>
-      <pose frame=''>0.35 0 0 0 -0 0</pose>
+      <pose relative_to='sprocket_axle'>0 0 0 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <mass>0.2</mass>
         <inertia>
           <ixx>0.004655</ixx>
@@ -64,7 +79,7 @@
         </inertia>
       </inertial>
       <collision name='sprocket_collision'>
-        <pose frame=''>0 0 0 1.5708 -0 0</pose>
+        <pose>0 0 0 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.51</length>
@@ -73,7 +88,7 @@
         </geometry>
       </collision>
       <visual name='sprocket_visual'>
-        <pose frame=''>0 0 0 1.5708 -0 0</pose>
+        <pose>0 0 0 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.51</length>
@@ -82,7 +97,7 @@
         </geometry>
       </visual>
       <visual name='sprocket_visual_1'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
             <size>0.01 0.51 0.2</size>
@@ -90,7 +105,7 @@
         </geometry>
       </visual>
       <visual name='sprocket_visual_2'>
-        <pose frame=''>0 0 0 0 -0 0</pose>
+        <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
             <size>0.2 0.51 0.01</size>
@@ -98,26 +113,10 @@
         </geometry>
       </visual>
     </link>
-    <joint name='sprocket_axle' type='revolute'>
-      <child>sprocket</child>
-      <parent>body</parent>
-      <axis>
-        <xyz>0 1 0</xyz>
-        <limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>0</use_parent_model_frame>
-      </axis>
-    </joint>
     <link name='track_wheel_link0'>
-      <pose frame=''>0.35 0 0.125 0 -0 0</pose>
+      <pose>0.35 0 0.125 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <mass>0.0571429</mass>
         <inertia>
           <ixx>0.00141369</ixx>
@@ -129,7 +128,7 @@
         </inertia>
       </inertial>
       <collision name='collision'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -151,7 +150,7 @@
         </surface>
       </collision>
       <visual name='visual'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -167,9 +166,9 @@
       </visual>
     </link>
     <link name='track_wheel_link1'>
-      <pose frame=''>0.233333 0 0.125 0 -0 0</pose>
+      <pose>0.233333 0 0.125 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <mass>0.0571429</mass>
         <inertia>
           <ixx>0.00141369</ixx>
@@ -181,7 +180,7 @@
         </inertia>
       </inertial>
       <collision name='collision'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -203,7 +202,7 @@
         </surface>
       </collision>
       <visual name='visual'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -219,9 +218,9 @@
       </visual>
     </link>
     <link name='track_wheel_link2'>
-      <pose frame=''>0.116667 0 0.125 0 -0 0</pose>
+      <pose>0.116667 0 0.125 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <mass>0.0571429</mass>
         <inertia>
           <ixx>0.00141369</ixx>
@@ -233,7 +232,7 @@
         </inertia>
       </inertial>
       <collision name='collision'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -255,7 +254,7 @@
         </surface>
       </collision>
       <visual name='visual'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -271,9 +270,9 @@
       </visual>
     </link>
     <link name='track_wheel_link3'>
-      <pose frame=''>0 0 0.125 0 -0 0</pose>
+      <pose>0 0 0.125 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <mass>0.0571429</mass>
         <inertia>
           <ixx>0.00141369</ixx>
@@ -285,7 +284,7 @@
         </inertia>
       </inertial>
       <collision name='collision'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -307,7 +306,7 @@
         </surface>
       </collision>
       <visual name='visual'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -323,9 +322,9 @@
       </visual>
     </link>
     <link name='track_wheel_link4'>
-      <pose frame=''>-0.116667 0 0.125 0 -0 0</pose>
+      <pose>-0.116667 0 0.125 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <mass>0.0571429</mass>
         <inertia>
           <ixx>0.00141369</ixx>
@@ -337,7 +336,7 @@
         </inertia>
       </inertial>
       <collision name='collision'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -359,7 +358,7 @@
         </surface>
       </collision>
       <visual name='visual'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -375,9 +374,9 @@
       </visual>
     </link>
     <link name='track_wheel_link5'>
-      <pose frame=''>-0.233333 0 0.125 0 -0 0</pose>
+      <pose>-0.233333 0 0.125 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <mass>0.0571429</mass>
         <inertia>
           <ixx>0.00141369</ixx>
@@ -389,7 +388,7 @@
         </inertia>
       </inertial>
       <collision name='collision'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -411,7 +410,7 @@
         </surface>
       </collision>
       <visual name='visual'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -427,9 +426,9 @@
       </visual>
     </link>
     <link name='track_wheel_link6'>
-      <pose frame=''>-0.35 0 0.125 0 -0 0</pose>
+      <pose>-0.35 0 0.125 0 -0 0</pose>
       <inertial>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <mass>0.0571429</mass>
         <inertia>
           <ixx>0.00141369</ixx>
@@ -441,7 +440,7 @@
         </inertia>
       </inertial>
       <collision name='collision'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -463,7 +462,7 @@
         </surface>
       </collision>
       <visual name='visual'>
-        <pose frame=''>0 0 -0.125 1.5708 -0 0</pose>
+        <pose>0 0 -0.125 1.5708 -0 0</pose>
         <geometry>
           <cylinder>
             <length>0.5</length>
@@ -481,7 +480,7 @@
     <joint name='track_wheel_joint0' type='revolute'>
       <child>track_wheel_link0</child>
       <parent>body</parent>
-      <pose frame=''>0 0 -0.125 0 -0 0</pose>
+      <pose>0 0 -0.125 0 -0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
@@ -499,7 +498,7 @@
     <joint name='track_wheel_joint1' type='revolute'>
       <child>track_wheel_link1</child>
       <parent>body</parent>
-      <pose frame=''>0 0 -0.125 0 -0 0</pose>
+      <pose>0 0 -0.125 0 -0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
@@ -517,7 +516,7 @@
     <joint name='track_wheel_joint2' type='revolute'>
       <child>track_wheel_link2</child>
       <parent>body</parent>
-      <pose frame=''>0 0 -0.125 0 -0 0</pose>
+      <pose>0 0 -0.125 0 -0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
@@ -535,7 +534,7 @@
     <joint name='track_wheel_joint3' type='revolute'>
       <child>track_wheel_link3</child>
       <parent>body</parent>
-      <pose frame=''>0 0 -0.125 0 -0 0</pose>
+      <pose>0 0 -0.125 0 -0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
@@ -553,7 +552,7 @@
     <joint name='track_wheel_joint4' type='revolute'>
       <child>track_wheel_link4</child>
       <parent>body</parent>
-      <pose frame=''>0 0 -0.125 0 -0 0</pose>
+      <pose>0 0 -0.125 0 -0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
@@ -571,7 +570,7 @@
     <joint name='track_wheel_joint5' type='revolute'>
       <child>track_wheel_link5</child>
       <parent>body</parent>
-      <pose frame=''>0 0 -0.125 0 -0 0</pose>
+      <pose>0 0 -0.125 0 -0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
@@ -589,7 +588,7 @@
     <joint name='track_wheel_joint6' type='revolute'>
       <child>track_wheel_link6</child>
       <parent>body</parent>
-      <pose frame=''>0 0 -0.125 0 -0 0</pose>
+      <pose>0 0 -0.125 0 -0 0</pose>
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
@@ -640,10 +639,13 @@
         </segment>
       </track>
     </plugin>
-    <static>0</static>
     <plugin name='gazebo_ros_control' filename='libgazebo_ros_control.so'>
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
       <legacyModeNS>0</legacyModeNS>
     </plugin>
+    <frame name='idler_axle' attached_to='body'>
+      <pose>-0.35 0 0 0 -0 0</pose>
+    </frame>
+    <frame name='idler' attached_to='idler_axle'/>
   </model>
 </sdf>

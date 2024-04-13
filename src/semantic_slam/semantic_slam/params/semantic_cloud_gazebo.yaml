@@ -8,14 +8,14 @@ camera:
   height: 480
 
 semantic_pcl:  
-  color_image_topic: "/camera/color/image_raw"
-  depth_image_topic: "/camera/aligned_depth_to_color/image_raw"   # ! realsense
+  color_image_topic: "/hsrb/head_rgbd_sensor/rgb/image_raw" #"/camera/color/image_raw" 
+  depth_image_topic: "/hsrb/head_rgbd_sensor/depth_registered/image_raw" #"/camera/aligned_depth_to_color/image_raw"   
   # depth_image_topic: "/camera/depth/image_rect_raw"  
   # depth_image_topic: "/camera/depth/image_raw"    #gazebo
 
-  frame_id: "/camera_color_optical_frame"     # gazebo & 2022
+  frame_id: "/head_rgbd_sensor_rgb_frame" #"/camera_color_optical_frame"      
 
   point_type: 1   # 0 Color 1 MAX 2 Bayes
   dataset: "ade20k" # sunrgbd
-  model_path: "/home/nrslcar/Open3DExplorer/src/semantic_slam/models/pspnet_50_ade20k.pth"
+  model_path: "/home/hamsadatta/test/thesis/catkin_ws/src/Open3DExplorer/src/semantic_slam/models/pspnet_50_ade20k.pth"
   # {YOUR_PATH}

@@ -114,7 +114,7 @@ void pcdoctomapCallback(const octomap_msgs::Octomap::ConstPtr &msg) {
     octomap::AbstractOcTree *read_tree = octomap_msgs::msgToMap(*msg);
     _octree_known = dynamic_cast<octomap::OcTree *>(read_tree);
 
-    Height_map.header.frame_id = "/world";
+    Height_map.header.frame_id = "world";
     Height_map.header.stamp = ros::Time::now();
     
     float Map_range = 40;
@@ -448,7 +448,7 @@ void rrtpath_callback(const nav_msgs::Path::ConstPtr &msg)
     _node_pose.pose.position = msg->poses[i].pose.position;
     _node_pose.pose.orientation = msg->poses[i].pose.orientation;
 
-    _node_pose.header.frame_id = "/world";
+    _node_pose.header.frame_id = "world";
     rrt_recieved_path.poses.push_back(_node_pose);
     // cout << "rrt_recieved_path.poses[i]: " << rrt_recieved_path.poses[i].pose.orientation << endl;
 
@@ -927,7 +927,7 @@ void timerCallback(const ros::TimerEvent &e)
     quaternionTFToMsg(quat, quat_geo);
     _node_pose.pose.orientation = quat_geo;
 
-    _node_pose.header.frame_id = "/world";
+    _node_pose.header.frame_id = "world";
     predefine_trajectory.poses.push_back(_node_pose);
     cout << "Waypoint in predefine_trajectory: " << Waypoints[i].transpose() << endl;
   }
@@ -1132,7 +1132,7 @@ int main(int argc, char **argv)
   // vel_cmd_pub =
   //     n.advertise<geometry_msgs::Twist>("/plt_velocity_controller/cmd_vel", 1);
   vel_cmd_pub =
-      n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+      n.advertise<geometry_msgs::Twist>("/hsrb/command_velocity", 1);
   g_yaw_cmd_pub = n.advertise<std_msgs::Float64>(
       "/joint11_velocity_controller/command", 1);
   g_pitch_cmd_pub = n.advertise<std_msgs::Float64>(
@@ -1152,9 +1152,9 @@ int main(int argc, char **argv)
   ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1, goalposeCallback);
   // ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/aeplanner/setpoint_position/local", 1, goalposeCallback);
 
-  plan_trajectory.header.frame_id = "/world";
-  trajectory_predict.header.frame_id = "/world";
-  predefine_trajectory.header.frame_id = "/world";
+  plan_trajectory.header.frame_id = "world";
+  trajectory_predict.header.frame_id = "world";
+  predefine_trajectory.header.frame_id = "world";
 
   Eigen::Vector2d wp(0,0);
   preset_waypoints.push_back(wp);

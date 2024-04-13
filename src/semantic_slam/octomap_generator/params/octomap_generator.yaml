@@ -3,7 +3,7 @@ octomap:
     # pointcloud_topic: "/semantic_pcl/semantic_pcl"
     pointcloud_topic: "/camera/depth/color/points"
     tree_type: 0
-    world_frame_id: "/world"
+    world_frame_id: "world"
     resolution: 0.4
     # max_range: 11.5
     # raycast_range: 10.5

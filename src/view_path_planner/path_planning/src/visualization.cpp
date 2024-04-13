@@ -91,14 +91,14 @@ void visualize_points(const vector<Eigen::Vector3d> points_list,
   visualization_msgs::Marker fp_points;
   visualization_msgs::Marker text_marker;
   // ma.markers.clear();
-  // text_marker.header.frame_id = fp_points.header.frame_id = "/world";
+  // text_marker.header.frame_id = fp_points.header.frame_id = "world";
   // text_marker.action = fp_points.action = visualization_msgs::Marker::DELETEALL;
   // ma.markers.push_back(fp_points);
   // ma.markers.push_back(text_marker);
   // task_view_pub.publish(ma);
 
   // ma.markers.clear();
-  text_marker.header.frame_id = fp_points.header.frame_id = "/world";
+  text_marker.header.frame_id = fp_points.header.frame_id = "world";
   text_marker.header.stamp = fp_points.header.stamp = ros::Time::now();
   text_marker.ns = fp_points.ns = "points_and_lines";
   text_marker.action = fp_points.action = visualization_msgs::Marker::ADD;
@@ -189,14 +189,14 @@ void visualize_points(const vector<Eigen::Vector3d> points_list) {
 
   visualization_msgs::Marker fp_points;
   // ma.markers.clear();
-  // text_marker.header.frame_id = fp_points.header.frame_id = "/world";
+  // text_marker.header.frame_id = fp_points.header.frame_id = "world";
   // text_marker.action = fp_points.action = visualization_msgs::Marker::DELETEALL;
   // ma.markers.push_back(fp_points);
   // ma.markers.push_back(text_marker);
   // task_view_pub.publish(ma);
 
   // ma.markers.clear();
-  fp_points.header.frame_id = "/world";
+  fp_points.header.frame_id = "world";
   fp_points.header.stamp = ros::Time::now();
   fp_points.ns = "points_and_lines";
   fp_points.action = visualization_msgs::Marker::ADD;
@@ -242,14 +242,14 @@ void visualize_points(const vector<Eigen::Vector3d> points_list,
   visualization_msgs::Marker fp_points;
   visualization_msgs::Marker text_marker;
   // ma.markers.clear();
-  // text_marker.header.frame_id = fp_points.header.frame_id = "/world";
+  // text_marker.header.frame_id = fp_points.header.frame_id = "world";
   // text_marker.action = fp_points.action = visualization_msgs::Marker::DELETEALL;
   // ma.markers.push_back(fp_points);
   // ma.markers.push_back(text_marker);
   // task_view_pub.publish(ma);
 
   // ma.markers.clear();
-  text_marker.header.frame_id = fp_points.header.frame_id = "/world";
+  text_marker.header.frame_id = fp_points.header.frame_id = "world";
   text_marker.header.stamp = fp_points.header.stamp = ros::Time::now();
   text_marker.ns = fp_points.ns = "points_and_lines";
   text_marker.action = fp_points.action = visualization_msgs::Marker::ADD;
@@ -324,14 +324,14 @@ void visualize_task_view(const vector<Eigen::Vector3d> points_list,
   // rviz_visual_tools::RvizVisualTools rviz_interface("world","/task_views");
   // rviz_interface.deleteAllMarkers();
   ma_taskview.markers.clear();
-  text_marker_taskview.header.frame_id = fp_points_taskview.header.frame_id = "/world";
+  text_marker_taskview.header.frame_id = fp_points_taskview.header.frame_id = "world";
   text_marker_taskview.action = fp_points_taskview.action = visualization_msgs::Marker::DELETEALL;
   ma_taskview.markers.push_back(fp_points_taskview);
   ma_taskview.markers.push_back(text_marker_taskview);
   task_view_pub.publish(ma_taskview);
 
   ma_taskview.markers.clear();
-  text_marker_taskview.header.frame_id = fp_points_taskview.header.frame_id = "/world";
+  text_marker_taskview.header.frame_id = fp_points_taskview.header.frame_id = "world";
   text_marker_taskview.header.stamp = fp_points_taskview.header.stamp = ros::Time::now();
   text_marker_taskview.ns = fp_points_taskview.ns = "points_and_lines";
   text_marker_taskview.action = fp_points_taskview.action = visualization_msgs::Marker::ADD;
@@ -403,7 +403,7 @@ void visualize_terrain_norm(const vector<Eigen::Vector3d> points_list,
 
   visualization_msgs::Marker fp_points;
 
-  fp_points.header.frame_id = "/world";
+  fp_points.header.frame_id = "world";
   fp_points.header.stamp = ros::Time::now();
   fp_points.ns = "points_and_lines";
   fp_points.action = visualization_msgs::Marker::ADD;

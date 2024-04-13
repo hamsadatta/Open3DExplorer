@@ -3,7 +3,9 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <cppad/cppad.hpp>
+#define HAVE_CSTDDEF
 #include <cppad/ipopt/solve.hpp>
+#undef HAVE_CSTDDEF
 #include <chrono>
 
 #include "Eigen/Core"

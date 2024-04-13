@@ -26,11 +26,12 @@ import numpy as np
 # sys.path.remove('/home/hitwzh/safe_exploration/devel/lib/python2.7/dist-packages')
 # print("path", sys.path)
 
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import PointCloud2, Image
 from color_pcl_generator_newnet import ColorPclGenerator
 from color_pcl_generator_newnet import PointType 
 import message_filters
 import time
+import ros_numpy
 
 from skimage.transform import resize
 import cv2
@@ -116,7 +117,7 @@ def color_map(N=256, normalized=False):
     cmap = cmap/255.0 if normalized else cmap
     return cmap
 
-color_file = os.path.abspath(os.path.join(os.getcwd(), "../Open3DExplorer/src/semantic_slam/color150_origin.mat")) 
+color_file = os.path.abspath(os.path.join(os.getcwd(), "/home/hamsadatta/test/thesis/catkin_ws/src/Open3DExplorer/src/semantic_slam/color150_origin.mat")) 
 colors = loadmat(color_file)['colors']
 # colors = loadmat('/home/nrslcar/wzh/perception_ws/src/semantic_slam/color150_binary.mat')['colors']
 
@@ -256,7 +257,7 @@ class SemanticCloud:
             self.n_classes = 150 # Semantic class number
             self.model = get_model(model_name, self.n_classes, version = 'ade20k')
             start_time = time.time()
-            state = torch.load(model_path)
+            state = torch.load('/home/hamsadatta/test/thesis/catkin_ws/src/Open3DExplorer/src/semantic_slam/models/pspnet_50_ade20k.pth')
             print('Begin setting up torch.cuda...')
             print(time.time() - start_time)
             self.model.load_state_dict(convert_state_dict(state['model_state'])) # Remove 'module' from dictionary keys
@@ -357,9 +358,11 @@ class SemanticCloud:
             # Publish semantic image
             if self.sem_img_pub.get_num_connections() > 0:
                 if self.point_type is PointType.SEMANTICS_MAX:
-                    semantic_color_msg = self.bridge.cv2_to_imgmsg(semantic_color, encoding="bgr8")
+                    # semantic_color_msg = self.bridge.cv2_to_imgmsg(semantic_color, encoding="bgr8")
+                    semantic_color_msg = ros_numpy.msgify(Image,semantic_color, encoding="bgr8")
                 else:
-                    semantic_color_msg = self.bridge.cv2_to_imgmsg(self.semantic_colors[0], encoding="bgr8")
+                    # semantic_color_msg = self.bridge.cv2_to_imgmsg(self.semantic_colors[0], encoding="bgr8")
+                    semantic_color_msg = ros_numpy.msgify(Image, self.semantic_colors[0], encoding="bgr8")
                 self.sem_img_pub.publish(semantic_color_msg)
 
         # Publish point cloud
@@ -376,7 +379,7 @@ class SemanticCloud:
         pred_confidence = pred_confidence.squeeze(0).cpu().numpy()
         pred_label = pred_label.squeeze(0).cpu().numpy()
         pred_label = resize(pred_label, (self.img_height, self.img_width), order = 0, mode = 'reflect', anti_aliasing=False, preserve_range = True) # order = 0, nearest neighbour
-        pred_label = pred_label.astype(np.int)
+        pred_label = pred_label.astype(int)
         # Add semantic color
         # semantic_color = decode_segmap(pred_label, self.n_classes, self.cmap)
         
@@ -399,7 +402,7 @@ class SemanticCloud:
       start_time = time.time()
       self.lock.acquire()
       try:
-        best_model = torch.load('~/Open3DExplorer/src/semantic_slam/models/pspnet_50_ade20k.pth')
+        best_model = torch.load('/home/hamsadatta/test/thesis/catkin_ws/src/Open3DExplorer/src/semantic_slam/models/pspnet_50_ade20k.pth')
         best_model = best_model.module
 
         best_model.eval();
@@ -415,7 +418,7 @@ class SemanticCloud:
       pred_confidence = pred_confidence.squeeze(0).cpu().numpy()
       pred_label = pred_label.squeeze(0).cpu().numpy()
       pred_label = resize(pred_label, (self.img_height, self.img_width), order = 0, mode = 'reflect', anti_aliasing=False, preserve_range = True) # order = 0, nearest neighbour
-      pred_label = pred_label.astype(np.int)
+      pred_label = pred_label.astype(int)
       # Add semantic color
       pred_confidence = resize(pred_confidence, (self.img_height, self.img_width),  mode = 'reflect', anti_aliasing=True, preserve_range = True)
       # print(pred_confidence)

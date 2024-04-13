@@ -17,7 +17,7 @@
     name="gimbal_link">
     <inertial>
       <origin
-        xyz="0.000434 0.00012166 0.0056729"
+        xyz="0.000434 0.00012166 1.0"
         rpy="0 0 0" />
       <mass
         value="0.012717" />
@@ -48,7 +48,7 @@
     name="gimbal_y_link">
     <inertial>
       <origin
-        xyz="0.011007 -0.0016306 0.020198"
+        xyz="0.011007 -0.0016306 1.0"
         rpy="0 0 0" />
       <mass
         value="0.0061357" />
@@ -79,7 +79,7 @@
     name="gimbal_y_joint"
     type="revolute">
     <origin
-      xyz="0.00035623 0.00035088 0.0121"
+      xyz="0.00035623 0.00035088 1.0"
       rpy="0 0 0.18" />
     <parent
       link="gimbal_link" />
@@ -97,7 +97,7 @@
     name="gimbal_r_link">
     <inertial>
       <origin
-        xyz="-0.013874 -0.015984 0.0010653"
+        xyz="-0.013874 -0.015984 1.0"
         rpy="0 0 0" />
       <mass
         value="0.034025" />
@@ -128,7 +128,7 @@
     name="gimbal_r_joint"
     type="fixed">
     <origin
-      xyz="0.027698 0.0013607 0.0565"
+      xyz="0.027698 0.0013607 1.0"
       rpy="0.0 0 0" />
     <parent
       link="gimbal_y_link" />
@@ -172,7 +172,7 @@
     name="gimbal_p_joint"
     type="revolute">
     <origin
-      xyz="-0.040574 -0.014575 0.0012157"
+      xyz="-0.040574 -0.014575 1.0"
       rpy="0 0 0" />
       <!-- 0 -0.8 0 -->
     <parent
