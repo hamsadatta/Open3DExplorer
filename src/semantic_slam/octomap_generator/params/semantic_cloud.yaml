@@ -16,7 +16,7 @@ semantic_pcl:
   depth_image_topic: "/hsrb/head_rgbd_sensor/depth_registered/image_raw"
   point_type: 1   # 0 Color 1 MAX 2 Bayes
   # frame_id: "/camera_rgb_optical_frame"
-  frame_id: "/head_rgbd_sensor_rgb_frame"
+  frame_id: "head_rgbd_sensor_rgb_frame" #change
   # frame_id: "camera_link_fake"
   dataset: "ade20k" # sunrgbd
   #dataset: "sunrgbd" # sunrgbd

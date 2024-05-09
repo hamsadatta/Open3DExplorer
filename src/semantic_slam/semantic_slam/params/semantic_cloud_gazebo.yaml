@@ -13,7 +13,7 @@ semantic_pcl:
   # depth_image_topic: "/camera/depth/image_rect_raw"  
   # depth_image_topic: "/camera/depth/image_raw"    #gazebo
 
-  frame_id: "/head_rgbd_sensor_rgb_frame" #"/camera_color_optical_frame"      
+  frame_id: "head_rgbd_sensor_rgb_frame" #change #"/camera_color_optical_frame"      
 
   point_type: 1   # 0 Color 1 MAX 2 Bayes
   dataset: "ade20k" # sunrgbd

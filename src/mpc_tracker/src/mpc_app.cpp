@@ -114,7 +114,7 @@ void pcdoctomapCallback(const octomap_msgs::Octomap::ConstPtr &msg) {
     octomap::AbstractOcTree *read_tree = octomap_msgs::msgToMap(*msg);
     _octree_known = dynamic_cast<octomap::OcTree *>(read_tree);
 
-    Height_map.header.frame_id = "world";
+    Height_map.header.frame_id = "/world"; //#change
     Height_map.header.stamp = ros::Time::now();
     
     float Map_range = 40;
@@ -234,7 +234,7 @@ void orbpose_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
   geometry_msgs::PoseStamped pose_msg;
   std_msgs::Header header;
   header.stamp = ros::Time::now();
-  header.frame_id = "world";
+  header.frame_id = "/world";
 
   Travel_Path_visualization.header = msg->header;
   // orb_path_.header.frame_id = map_frame_id_param_;
@@ -310,7 +310,7 @@ void CameraState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
   geometry_msgs::PoseStamped pose_msg;
   std_msgs::Header header;
   header.stamp = ros::Time::now();
-  header.frame_id = "world";
+  header.frame_id = "/world";
   Travel_Path_visualization.header = msg->header;
   // orb_path_.header.frame_id = map_frame_id_param_;
   pose_msg.pose.position = msg->pose.pose.position;
@@ -448,7 +448,7 @@ void rrtpath_callback(const nav_msgs::Path::ConstPtr &msg)
     _node_pose.pose.position = msg->poses[i].pose.position;
     _node_pose.pose.orientation = msg->poses[i].pose.orientation;
 
-    _node_pose.header.frame_id = "world";
+    _node_pose.header.frame_id = "/world";
     rrt_recieved_path.poses.push_back(_node_pose);
     // cout << "rrt_recieved_path.poses[i]: " << rrt_recieved_path.poses[i].pose.orientation << endl;
 
@@ -927,7 +927,7 @@ void timerCallback(const ros::TimerEvent &e)
     quaternionTFToMsg(quat, quat_geo);
     _node_pose.pose.orientation = quat_geo;
 
-    _node_pose.header.frame_id = "world";
+    _node_pose.header.frame_id = "/world";
     predefine_trajectory.poses.push_back(_node_pose);
     cout << "Waypoint in predefine_trajectory: " << Waypoints[i].transpose() << endl;
   }
@@ -1152,9 +1152,9 @@ int main(int argc, char **argv)
   ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1, goalposeCallback);
   // ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/aeplanner/setpoint_position/local", 1, goalposeCallback);
 
-  plan_trajectory.header.frame_id = "world";
-  trajectory_predict.header.frame_id = "world";
-  predefine_trajectory.header.frame_id = "world";
+  plan_trajectory.header.frame_id = "/world";
+  trajectory_predict.header.frame_id = "/world";
+  predefine_trajectory.header.frame_id = "/world";
 
   Eigen::Vector2d wp(0,0);
   preset_waypoints.push_back(wp);
