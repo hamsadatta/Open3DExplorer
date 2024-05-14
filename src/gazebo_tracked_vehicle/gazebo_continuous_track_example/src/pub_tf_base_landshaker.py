@@ -47,6 +47,6 @@ def Position_callback(odom_data):
 if __name__ == '__main__':
     rospy.init_node('turtle_tf_broadcaster')
 
-    rospy.Subscriber("/ground_truth/base_state",Odometry,Position_callback) 
+    rospy.Subscriber("/hsrb/odom_ground_truth",Odometry,Position_callback) 
 
     rospy.spin()

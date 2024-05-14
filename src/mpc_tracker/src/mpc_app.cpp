@@ -17,6 +17,9 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int16.h>
 #include <sensor_msgs/JointState.h>
+#include <trajectory_msgs/JointTrajectory.h>
+#include <controller_manager_msgs/ControllerState.h>
+#include <controller_manager_msgs/ListControllers.h>
 
 #include "geometry_msgs/PointStamped.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -60,14 +63,15 @@ ros::Publisher pub_terrain_map_tracking;
 ros::Publisher trajectory_pub;
 ros::Publisher trajectory_predict_pub;
 ros::Publisher vel_cmd_pub;
-ros::Publisher g_yaw_cmd_pub;
-ros::Publisher g_pitch_cmd_pub;
+// ros::Publisher g_yaw_cmd_pub;
+// ros::Publisher g_pitch_cmd_pub;
 ros::Publisher pub_reach_goal;
 ros::Publisher pub_pitch;
 ros::Publisher pub_cur_goal;
 ros::Publisher pub_terrain_map_1;
 ros::Publisher NormVec_publisher;
 ros::Publisher Travel_Path_publisher;
+ros::Publisher g_yaw_pitch_cmd_pub;
 nav_msgs::Path Travel_Path_visualization;
 nav_msgs::Path Poly_fitting_curve;
 
@@ -328,8 +332,8 @@ void CameraState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 
 double pitch_base2cam, yaw_base2cam;
 void JointState_Cb(const sensor_msgs::JointState::ConstPtr &msg){
-  pitch_base2cam = -msg->position[0];
-  yaw_base2cam = -msg->position[1];
+  pitch_base2cam = -msg->position[10];
+  yaw_base2cam = -msg->position[9];
   cout << "joint_state pitch: " << pitch_base2cam << " yaw_state: " << yaw_base2cam << endl;
 }
 
@@ -720,15 +724,18 @@ void timerCallback(const ros::TimerEvent &e)
   if (!rrt_update)
   {
     ros::Time t1 = ros::Time::now();
-    double t_cur = t1.toSec();//获取的是自1970年一月一日到现在时刻的秒数
+    double t_cur = t1.toSec();//What is obtained is the number of seconds since January 1, 1970 to the present time.
     
     Waypoints.clear();
     // Waypoints.resize(Predict_steps);
 
     cout << "rrt not update..." << endl;
 
-    // 用于RRT没更新时的路径跟踪。在未执行的路点中寻找与当前位置最近的路点的下一个路点及后续的路点，作为新的跟踪路径
-    // 存在的问题：当节点的位置在一起，但旋转都不同时，会直接导致路径中只存在最后一个路点
+    // Used for path tracking when RRT is not updated. Find the next waypoint and subsequent waypoints
+    // that are closest to the current position among unexecuted waypoints as a new tracking path
+
+    // Existing problem: When the positions of the nodes are together but the rotations are different, 
+    // it will directly lead to the existence of only the last waypoint in the path.
     float _min_distance_pos = 1e5;
     float _min_distance_orient = 1e5;
     int _min_idx = 0;
@@ -966,7 +973,8 @@ void timerCallback(const ros::TimerEvent &e)
   MatrixXd u_k;
   // solve mpc for state and reference trajectory
   // returns [steering_angle, acceleration]
-  u_k = mpc.Solve(state, ref_wp, Predict_steps);
+  u_k = mpc.Solve(state, ref_wp, Predict_steps);  
+  ROS_INFO("MPC solved");
 
   // if(u_k.col(0).norm() < 0.2 && Predict_steps >= 2){
   //   cout << "control is too small!!!!!!!!" << endl;
@@ -980,15 +988,33 @@ void timerCallback(const ros::TimerEvent &e)
   cmd.angular.z = u_k.col(0)(1);
   vel_cmd_pub.publish(cmd);
 
+
+  // fill ROS message for head control
+  trajectory_msgs::JointTrajectory head_traj;
   std_msgs::Float64 yaw_desire;
+  std_msgs::Float64 pitch_desire;
+
   // yaw_desire.data = abs(cur_cam_yaw) > 1.5708 ? u_k.col(0)(2) : -u_k.col(0)(2);
   yaw_desire.data = -u_k.col(0)(2);
-  g_yaw_cmd_pub.publish(yaw_desire);
-
-  std_msgs::Float64 pitch_desire;
   pitch_desire.data = -u_k.col(0)(3); // pitch控制：负值朝上运动
-  // pitch_desire.data = 0;
-  g_pitch_cmd_pub.publish(pitch_desire);
+
+  head_traj.joint_names.push_back("head_pan_joint");
+  head_traj.joint_names.push_back("head_tilt_joint");
+
+  head_traj.points.resize(1);
+
+  head_traj.points[0].positions.resize(2);
+  head_traj.points[0].velocities.resize(2);
+  head_traj.points[0].velocities[0] = yaw_desire.data;
+  head_traj.points[0].velocities[1] = pitch_desire.data;
+  // for (size_t i = 0; i < 2; ++i) {
+  //   head_traj.points[0].velocities[i] = 0.0;
+  // }
+  head_traj.points[0].time_from_start = ros::Duration(1.0);
+
+  // publish ROS message for head control
+  ROS_INFO("head_yaw_desire: %f, head_pitch_desire: %f", yaw_desire.data, pitch_desire.data);
+  g_yaw_pitch_cmd_pub.publish(head_traj);
 
   // Visualization of predict path
   trajectory_predict.poses.clear();
@@ -1102,7 +1128,7 @@ int main(int argc, char **argv)
 #endif
   
   ros::Subscriber joint_state_sub = n.subscribe<sensor_msgs::JointState>(
-      "/joint_states", 1, JointState_Cb);
+      "/hsrb/joint_states", 1, JointState_Cb);
 
   NormVec_publisher = n.advertise<nav_msgs::Path> ("/visual_norm_vec", 1);
   Travel_Path_publisher = n.advertise<nav_msgs::Path> ("/Traveled_path", 1);
@@ -1112,7 +1138,7 @@ int main(int argc, char **argv)
   //  body_imu_callback);
 
   ros::Subscriber base_state_sub = n.subscribe<nav_msgs::Odometry>(
-      "/ground_truth/base_state", 1, BaseState_Cb);
+      "/hsrb/odom_ground_truth", 1, BaseState_Cb);
 
   ros::Subscriber HeightMap_sub =
   n.subscribe<nav_msgs::OccupancyGrid>("/Height_map_tracking", 1, HeightMapCb);
@@ -1133,10 +1159,36 @@ int main(int argc, char **argv)
   //     n.advertise<geometry_msgs::Twist>("/plt_velocity_controller/cmd_vel", 1);
   vel_cmd_pub =
       n.advertise<geometry_msgs::Twist>("/hsrb/command_velocity", 1);
-  g_yaw_cmd_pub = n.advertise<std_msgs::Float64>(
-      "/joint11_velocity_controller/command", 1);
-  g_pitch_cmd_pub = n.advertise<std_msgs::Float64>(
-      "/joint10_velocity_controller/command", 1);
+
+  
+  // make sure the hsr head controller is running
+  ros::ServiceClient client = n.serviceClient<controller_manager_msgs::ListControllers>(
+      "/hsrb/controller_manager/list_controllers");
+  controller_manager_msgs::ListControllers list_controllers;
+  bool running = false;
+  while (running == false) {
+    ros::Duration(0.1).sleep();
+    ROS_INFO("Waiting for HSR's head controller to start...");
+    if (client.call(list_controllers)) {
+      for (unsigned int i = 0; i < list_controllers.response.controller.size(); i++) {
+        controller_manager_msgs::ControllerState c = list_controllers.response.controller[i];
+        if (c.name == "head_trajectory_controller" && c.state == "running") {
+          running = true;
+          ROS_INFO("head controller is running");
+        }
+        else {
+          ROS_WARN("head controller is not running");
+        }
+      }
+    }
+  }
+  
+  g_yaw_pitch_cmd_pub = n.advertise<trajectory_msgs::JointTrajectory>("/hsrb/head_trajectory_controller/command", 10);
+  
+  // g_yaw_cmd_pub = n.advertise<std_msgs::Float64>(
+  //     "/joint11_velocity_controller/command", 1);
+  // g_pitch_cmd_pub = n.advertise<std_msgs::Float64>(
+  //     "/joint10_velocity_controller/command", 1);
 
   pub_reach_goal = n.advertise<std_msgs::Int16>(
       "/goal_reached", 1);
