@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import rospy
 import time
@@ -116,7 +116,7 @@ if __name__=="__main__":
 
     rospy.Subscriber("/pitch_position_controller", Float64, callback_pitch)
     rospy.Subscriber("/yaw_position_controller", Float64, callback_yaw)
-    rospy.Subscriber("/joint_states",JointState,callback)
+    rospy.Subscriber("/hsrb/joint_states",JointState,callback)
 
     init_flag = 0
 
@@ -125,6 +125,6 @@ if __name__=="__main__":
         stop_key = getKey()
 
         if stop_key == '\x03':
-            print "exit"
+            print("exit")
             break
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 
@@ -76,7 +76,7 @@ speedBindings={
 class PublishThread(threading.Thread):
     def __init__(self, rate):
         super(PublishThread, self).__init__()
-        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+        self.publisher = rospy.Publisher('/hsrb/command_velocity', Twist, queue_size = 1)
         self.publisher_sw = rospy.Publisher('/joint_position_controller/command', Float64, queue_size = 10)
         self.x = 0.0
         self.y = 0.0

@@ -32,11 +32,11 @@ double dt = 0.2;
 // double max_gama = 0.6;
 
 // Terrain
-double max_v = 0.6;
-double max_w_base = 0.4;
-double max_gama = 0.4;    // gimbal yaw velocity
-double max_w_inw = 0.4;
-double max_beta = 0.4;
+double max_v = 0.4; //0.6
+double max_w_base = 0.2; //0.4
+double max_gama = 0.2;    //0.4 // gimbal yaw velocity
+double max_w_inw = 0.2; //0.4
+double max_beta = 0.2; //0.4
 
 // const int N_S = 8;  // 邻域 3^2-1
 // const int N_S = 24;               // 邻域 5^2-1
@@ -980,7 +980,7 @@ class FG_eval {
 
     // minimize the tracking error
     for (int t = 1; t < N; t++) {
-      // double _lamda_err = 1.0/float(t);    // 步数t越大，lamda越小，ERROR cost占比越小
+      // double _lamda_err = 1.0/float(t);    // The larger the step number t, the smaller the lambda, and the smaller the ERROR cost proportion.
       double _lamda_err = 5.0;
 
       fg[0] +=
@@ -1098,7 +1098,7 @@ class FG_eval {
       AD<double> gama0 = vars[gama_start + t - 1];
       AD<double> beta0 = vars[beta_start + t - 1];
 
-      AD<double> _pre_pitch = pitch_b0;    // 不考虑地形影响，假设地形都与当前状态一致
+      AD<double> _pre_pitch = pitch_b0;    // Regardless of the impact of terrain, it is assumed that the terrain is consistent with the current state
       AD<double> _pre_roll = roll_b0;
       // cout << "_pre_pitch: " << _pre_pitch << endl;
       
@@ -1167,7 +1167,7 @@ Eigen::MatrixXd MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd ref_wp,
     return U_result;
   }
   
-  _ref_base_yaw = state[2];    // 以cur_yaw为参考
+  _ref_base_yaw = state[2];    // Take cur_yaw as reference
 
   // Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2
@@ -1175,7 +1175,7 @@ Eigen::MatrixXd MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd ref_wp,
   //
   // x, y, theta_b, theta_c; v, w, gama, beta
   size_t n_vars = 7 * N + 4 * (N - 1);
-  // Set the number of constraints, 运动学模型约束
+  // Set the number of constraints, Kinematic model constraints
   size_t n_constraints = 7 * N;
 
   // Initial value of the independent variables.
@@ -1187,16 +1187,18 @@ Eigen::MatrixXd MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd ref_wp,
   vars[x_start] = state[0];
   vars[y_start] = state[1];
   vars[theta_b_start] = state[2];
-  vars[theta_bc_start] = state[3] - state[2];     // ! 这里应该从joint_states读取
+  vars[theta_bc_start] = state[3] - state[2];     // ! This should be read from joint_states
   vars[pitch_b_start] = state[4];
-  vars[pitch_bc_start] = state[5];    // ! 从joint_states读取的pitch角
+  vars[pitch_bc_start] = state[5];    // ! pitch angle read from joint_states
   vars[roll_b_start] = state[6];
 
   // for(int i = 1; i < N; ++i){
   //   vars[pitch_c_start + i] = 0.05 * i;
   // }
 
-  // 添加状态量-相机旋转速度的约束，即底盘不管怎么转，保证相机的转速在一定范围内即可。
+  // Add a state quantity - a constraint on the camera's rotation speed,
+  // that is, no matter how the chassis rotates, it is enough to ensure that
+  // the camera's rotation speed is within a certain range.
 
   vars[v_start] = state[7];
   vars[w_start] = state[8];
@@ -1205,7 +1207,7 @@ Eigen::MatrixXd MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd ref_wp,
 
   cout << "initial vars: " << vars << endl;
 
-  // 变量的上下限
+  // Upper and lower bounds of variables
   // Set lower and upper limits for variables.
   Dvector vars_lowerbound(n_vars);
   Dvector vars_upperbound(n_vars);
@@ -1228,16 +1230,16 @@ Eigen::MatrixXd MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd ref_wp,
     vars_lowerbound[i] = -1.0e19;
     vars_upperbound[i] = 1.0e19;
   }
-  // theta_pitch_bc 绝对值
+  // theta_pitch_bc absolute value
   for (int i = pitch_b_start; i < pitch_bc_start; i++) {
-    vars_lowerbound[i] = -1.5;
-    vars_upperbound[i] = 1.5;
+    vars_lowerbound[i] = -0.785; //-1.5
+    vars_upperbound[i] = 0.35; //1.5
   }
 
-  // theta_pitch in world 绝对值
+  // theta_pitch in world absolute value
   for (int i = pitch_bc_start; i < v_start; i++) {
-    vars_lowerbound[i] = -1.5;
-    vars_upperbound[i] = 1.5;
+    vars_lowerbound[i] = -0.785; //-1.5
+    vars_upperbound[i] = 0.35; //1.5
   }
 
   // The upper and lower limits of delta are set to -25 and 25
@@ -1267,32 +1269,32 @@ Eigen::MatrixXd MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd ref_wp,
     vars_upperbound[i] = max_beta;
   }
 
-  // 等式约束
+  // Equality constraints
   // Lower and upper limits for the constraints
   // Should be 0 besides initial state.
   Dvector constraints_lowerbound(n_constraints);
   Dvector constraints_upperbound(n_constraints);
   for (int i = 0; i < n_constraints; i++) {
-    // 除初始值外其余为等式约束，运动学模型
+    // Except for the initial value, the rest are equality constraints, kinematic model
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
 
-  // 等式约束
+  // Equality constraints
   constraints_lowerbound[x_start] = state[0];
   constraints_lowerbound[y_start] = state[1];
   constraints_lowerbound[theta_b_start] = state[2];
-  constraints_lowerbound[theta_bc_start] = state[3] - state[2];     // ! 这里应该从joint_states读取
+  constraints_lowerbound[theta_bc_start] = state[3] - state[2];     // ! This should be read from joint_states
   constraints_lowerbound[pitch_b_start] = state[4];
-  constraints_lowerbound[pitch_bc_start] = state[5];    // ! 从joint_states读取的pitch角
+  constraints_lowerbound[pitch_bc_start] = state[5];    // ! pitch angle read from joint_states
   constraints_lowerbound[roll_b_start] = state[6];
 
   constraints_upperbound[x_start] = state[0];
   constraints_upperbound[y_start] = state[1];
   constraints_upperbound[theta_b_start] = state[2];
-  constraints_upperbound[theta_bc_start] = state[3] - state[2];     // ! 这里应该从joint_states读取
+  constraints_upperbound[theta_bc_start] = state[3] - state[2];     // ! This should be read from joint_states
   constraints_upperbound[pitch_b_start] = state[4];
-  constraints_upperbound[pitch_bc_start] = state[5];    // ! 从joint_states读取的pitch角
+  constraints_upperbound[pitch_bc_start] = state[5];    // ! pitch angle read from joint_states
   constraints_upperbound[roll_b_start] = state[6];
 
   // object that computes objective and constraints

@@ -76,7 +76,7 @@ void PlanningVisualization(ros::NodeHandle &nh){
   pcl_marker_pub = nh.advertise<sensor_msgs::PointCloud2> ("pcl_marker", 1);     
   terrain_norm_vec_pub = 
       nh.advertise<visualization_msgs::MarkerArray>("norm_vectors", 1, true);  //
-  goal_pub_ = nh.advertise<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1);
+  goal_pub_ = nh.advertise<geometry_msgs::PoseStamped>("/my_move_base_simple/goal", 1);
 
 }
 

@@ -2,6 +2,7 @@
   <arg name="namespace" default="hsrb"/>
   <arg name="personal_name" default="" />
   <arg name="debug" default="false"/>
+  <arg name="sim" default="true" />
   <arg name="gui" default="true" />
   <arg name="rviz" default="false"/>
   <arg name="gazebo_visualization" default="false" />
@@ -14,7 +15,7 @@
   <arg name="use_laser_odom" default="false" />
   <arg name="paused" default="true" />
   <arg name="fast_physics" default="false" />
-  <arg name="use_orbslam" default="true" />
+  <arg name="use_orbslam" default="false" />
   <arg name="robot_name" default="$(optenv ROBOT_NAME hsrb)" />
   <arg unless="$(arg fast_physics)" name="world_suffix" value=""/>
   <arg     if="$(arg fast_physics)" name="world_suffix" value="_fast"/>
@@ -34,7 +35,7 @@
 
   <include file="$(find hsrb_gazebo_launch)/launch/include/hsrb_gazebo_common.xml" pass_all_args="true" >
     <arg name="map" value="$(find tmc_potential_maps)/maps/white_space/map.yaml" />
-    <arg name="world_name" value="$(find hsr_gazebo)/worlds/hsr_apple.world"/>
+    <arg name="world_name" value="$(find hsr_gazebo)/worlds/hsr_explore_wall_apple.world"/>
     <arg name="robot_pos" value="-x 0.2 -y 0 -z 0 -Y 0" />
     <arg name="ground_truth_xyz_offset" value="0.0\ 0.0\ 0.0" />
     <arg name="ground_truth_rpy_offset" value="0.0\ 0.0\ 0.0" />
@@ -49,7 +50,7 @@
 
     <rosparam file="$(find gazebo_continuous_track_example)/config/gimbal.yaml" command="load"/>
 
-    <node name="cmd_relay" pkg="topic_tools" type="relay" args="/cmd_vel /track_velocity_controller/cmd_vel" output="screen" />
+    <node name="cmd_relay" pkg="topic_tools" type="relay" args="/hsrb/command_velocity /track_velocity_controller/cmd_vel" output="screen" />
 
     <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
         output="screen"  args="joint_state_controller joint10_velocity_controller joint11_velocity_controller"/>
@@ -59,10 +60,11 @@
     <!-- <node pkg="plt_control" name="control_py" type="control.py"  required="false" /> -->
     
     <!-- <node pkg="teleop_twist_keyboard" name="view_control" type="view_control.py"  required="false" launch-prefix="xterm -e"/>  -->
-    <node pkg="teleop_twist_keyboard" name="view_control" type="view_control.py"  required="false" /> 
+    <!-- <node pkg="teleop_twist_keyboard" name="view_control" type="view_control.py"  required="false" />  -->
 
     <!-- use_orbslam为false(即使用gazebo直接发布tf)则运行此句 监听gimbal_link的tf，gimbal_link到camera_link的转换由urdf的tf获取 -->
-    <node unless="$(arg use_orbslam)" pkg="gazebo_continuous_track_example" name="pubtfbase_py" type="pub_tf_base_landshaker.py" required="true"/>
+    <!-- If use_orbslam is false (that is, use gazebo to publish tf directly), run this sentence to monitor the tf of gimbal_link. The conversion from gimbal_link to camera_link is obtained by the tf of urdf. -->
+    <!-- <node unless="$(arg use_orbslam)" pkg="gazebo_continuous_track_example" name="pubtfbase_py" type="pub_tf_base_landshaker.py" required="true"/>? -->
 
     <node pkg="teleop_twist_keyboard" type="twist_to_std_msg.py" name="twist_to_std_msg_node" />
 

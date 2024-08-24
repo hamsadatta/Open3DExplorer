@@ -5,8 +5,8 @@ track_joint_publisher:
 
 track_velocity_controller:
   type: "diff_drive_controller/DiffDriveController"
-  left_wheel: ['left_sprocket_axle']
-  right_wheel: ['right_sprocket_axle']
+  left_wheel: ['base_l_drive_wheel_link'] #['left_sprocket_axle']
+  right_wheel: ['base_r_drive_wheel_link'] #['right_sprocket_axle']
   publish_rate: 50
   pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]
   twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.03]

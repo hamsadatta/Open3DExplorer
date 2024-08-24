@@ -330,7 +330,7 @@ if __name__=="__main__":
     # rospy.Subscriber("/body_imu", Imu, callback_bodyimu)
     # rospy.Subscriber("/d435i/imu", Imu, callback_d435imu)
     rospy.Subscriber("/best_view_robot", Vector3, callback_bestview)
-    rospy.Subscriber("/joint_states",JointState,callback)
+    rospy.Subscriber("/hsrb/joint_states",JointState,callback)
     # rospy.Subscriber("/cmd_vel",Twist,callback2)
     # rospy.Subscriber("/gazebo/model_states",ModelStates,callback3)
     # pub7 = rospy.Publisher('/is_done',Int16, queue_size=3)
@@ -352,7 +352,7 @@ if __name__=="__main__":
         stop_key = getKey()
 
         if stop_key == '\x03':
-            print "exit"
+            print("exit")
             # pub_break.publish(1)
             # time.sleep(1)
             break

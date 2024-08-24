@@ -17,9 +17,6 @@
 #include <std_msgs/Bool.h>
 #include <std_msgs/Int16.h>
 #include <sensor_msgs/JointState.h>
-#include <trajectory_msgs/JointTrajectory.h>
-#include <controller_manager_msgs/ControllerState.h>
-#include <controller_manager_msgs/ListControllers.h>
 
 #include "geometry_msgs/PointStamped.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -37,10 +34,10 @@
 #define PI 3.1415926
 // #define N 10
 
-// !One of the following three must be 1
-#define def_Predefined_traj_TEST 1    // Set endpoint tracking through movebase_goal
-#define def_Insert_Traj 0   // Track rrt planning results
-#define SetValue_TEST 0   // Numerical simulation test
+// !下列三个中必须有一个为1
+#define def_Predefined_traj_TEST 1    // 通过movebase_goal设定终点的跟踪
+#define def_Insert_Traj 0   // 对rrt规划结果进行跟踪
+#define SetValue_TEST 0   // 数值仿真测试
 
 #define def_USING_ORBSLAM 1
 
@@ -63,15 +60,14 @@ ros::Publisher pub_terrain_map_tracking;
 ros::Publisher trajectory_pub;
 ros::Publisher trajectory_predict_pub;
 ros::Publisher vel_cmd_pub;
-// ros::Publisher g_yaw_cmd_pub;
-// ros::Publisher g_pitch_cmd_pub;
+ros::Publisher g_yaw_cmd_pub;
+ros::Publisher g_pitch_cmd_pub;
 ros::Publisher pub_reach_goal;
 ros::Publisher pub_pitch;
 ros::Publisher pub_cur_goal;
 ros::Publisher pub_terrain_map_1;
 ros::Publisher NormVec_publisher;
 ros::Publisher Travel_Path_publisher;
-ros::Publisher g_yaw_pitch_cmd_pub;
 nav_msgs::Path Travel_Path_visualization;
 nav_msgs::Path Poly_fitting_curve;
 
@@ -96,7 +92,6 @@ Vector3d g_goal_orient;
 bool is_recieved_goal = false;
 int pit_ctrl_count = 0;
 
-// Not Used
 int flag_knownmap_track = 0;
 void pcdoctomapCallback(const octomap_msgs::Octomap::ConstPtr &msg) {
   struct timeval tv;
@@ -119,7 +114,7 @@ void pcdoctomapCallback(const octomap_msgs::Octomap::ConstPtr &msg) {
     octomap::AbstractOcTree *read_tree = octomap_msgs::msgToMap(*msg);
     _octree_known = dynamic_cast<octomap::OcTree *>(read_tree);
 
-    Height_map.header.frame_id = "/world"; //#change
+    Height_map.header.frame_id = "/world";
     Height_map.header.stamp = ros::Time::now();
     
     float Map_range = 40;
@@ -214,7 +209,6 @@ double cur_cam_yaw_last;
 bool b_received_pose = false;
 void orbpose_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
 {
-  cout << "############################ orbpose_callback ##############################" << endl;
   ROS_INFO("Entered Orbslam pose Callback...");
   tf::Quaternion quat;
   tf::quaternionMsgToTF(msg->pose.orientation, quat);
@@ -273,7 +267,6 @@ void body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
 tf::Quaternion quat_camera_cb;
 void CameraState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 {
-  cout << "############################ CameraState_Cb ##############################" << endl;
   // cout << "msg->pose.pose.orientation: " << msg->pose.pose.orientation << endl;
   tf::quaternionMsgToTF(msg->pose.pose.orientation, quat_camera_cb);
 
@@ -335,16 +328,14 @@ void CameraState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 
 double pitch_base2cam, yaw_base2cam;
 void JointState_Cb(const sensor_msgs::JointState::ConstPtr &msg){
-  cout << "############################ JointState_Cb ##############################" << endl;
-  pitch_base2cam = -msg->position[10];
-  yaw_base2cam = -msg->position[9];
+  pitch_base2cam = -msg->position[0];
+  yaw_base2cam = -msg->position[1];
   cout << "joint_state pitch: " << pitch_base2cam << " yaw_state: " << yaw_base2cam << endl;
 }
 
 bool enter_basestate_cb = false;
 void BaseState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 {
-  cout << "############################ BaseState_Cb ##############################" << endl;
   tf::Quaternion quat;
   tf::quaternionMsgToTF(msg->pose.pose.orientation, quat);
   // tf::Matrix3x3(quat).getRPY(cur_base_pitch, cur_base_roll, 
@@ -376,7 +367,6 @@ void BaseState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 bool heightmap_initialed = false;
 void HeightMapCb(const nav_msgs::OccupancyGrid::ConstPtr &msg)
 {
-  cout << "############################ HeightMapCb ##############################" << endl;
   Height_map.header = msg->header;
   Height_map.info = msg->info;
   ROS_INFO("Got map %d %d", Height_map.info.width, Height_map.info.height);
@@ -399,7 +389,6 @@ bool rrt_update = false;
 bool rrt_initialed = false;
 void rrtpath_callback(const nav_msgs::Path::ConstPtr &msg)
 {
-  cout << "############################ rrtpath_callback ##############################" << endl;
   ROS_INFO("Enter rrt path callback.");
   if (!b_received_pose)
   {
@@ -540,7 +529,6 @@ std_msgs::Int16 _reached;
 static int goal_cb_count = 0;
 void goalposeCallback(const geometry_msgs::PoseStampedConstPtr &waypoint)
 {
-  cout << "############################ goalposeCallback ##############################" << endl;
   if(!f_goal_reached && goal_cb_count!=0)
     return;
   
@@ -577,7 +565,6 @@ void goalposeCallback(const geometry_msgs::PoseStampedConstPtr &waypoint)
 }
 
 bool Reach_Goal_func(){
-  cout << "############################ Reach_Goal_func ##############################" << endl;
   float _reach_pos_eps = 4;
   // float _reach_pos_eps = 1;
   float _reach_rot_eps = 0.3;
@@ -609,7 +596,7 @@ bool Reach_Goal_func(){
 
 void Predefined_Trajectory()
 {
-  cout << "############################ Predefined_Trajectory ##############################" << endl;
+
   Waypoints_rrt.clear();
 
   Eigen::VectorXd _waypoint(6);
@@ -691,14 +678,13 @@ bool init_predefine_traj = false;
 static int goal_set_count = 0;
 void timerCallback(const ros::TimerEvent &e)
 {
-  cout << "############################ timerCallback ##############################" << endl;
   ros::Time t1 = ros::Time::now();
   double t_cur = t1.toSec(); //获取的是自1970年一月一日到现在时刻的秒数
   printf("The time is: %16f\n",
          t_cur); //打印，%16f表示的是16位宽度的float类型的数字
 
   if(goal_cb_count == 0){
-    g_goal_pos = g_position_fb; //coming from orbpose_cb
+    g_goal_pos = g_position_fb;
     g_goal_orient = g_orientation_fb;
   }
 
@@ -716,10 +702,6 @@ void timerCallback(const ros::TimerEvent &e)
   }
   cout << "msg.data: " << _reached.data << endl;
   
-  // init_predefine_traj is set above
-  // enter_basestate_cb comes from BaseState_Cb 
-  // b_received_pose comes from orbpose_callback
-  // is_recieved_goal comes from goalposeCallback
   if (!init_predefine_traj && enter_basestate_cb && b_received_pose && is_recieved_goal)
   {
     Predefined_Trajectory();
@@ -738,18 +720,15 @@ void timerCallback(const ros::TimerEvent &e)
   if (!rrt_update)
   {
     ros::Time t1 = ros::Time::now();
-    double t_cur = t1.toSec();//What is obtained is the number of seconds since January 1, 1970 to the present time.
+    double t_cur = t1.toSec();//获取的是自1970年一月一日到现在时刻的秒数
     
     Waypoints.clear();
     // Waypoints.resize(Predict_steps);
 
     cout << "rrt not update..." << endl;
 
-    // Used for path tracking when RRT is not updated. Find the next waypoint and subsequent waypoints
-    // that are closest to the current position among unexecuted waypoints as a new tracking path
-
-    // Existing problem: When the positions of the nodes are together but the rotations are different, 
-    // it will directly lead to the existence of only the last waypoint in the path.
+    // 用于RRT没更新时的路径跟踪。在未执行的路点中寻找与当前位置最近的路点的下一个路点及后续的路点，作为新的跟踪路径
+    // 存在的问题：当节点的位置在一起，但旋转都不同时，会直接导致路径中只存在最后一个路点
     float _min_distance_pos = 1e5;
     float _min_distance_orient = 1e5;
     int _min_idx = 0;
@@ -987,9 +966,8 @@ void timerCallback(const ros::TimerEvent &e)
   MatrixXd u_k;
   // solve mpc for state and reference trajectory
   // returns [steering_angle, acceleration]
-  u_k = mpc.Solve(state, ref_wp, Predict_steps);  
-  ROS_INFO("MPC solved");
-  
+  u_k = mpc.Solve(state, ref_wp, Predict_steps);
+
   // if(u_k.col(0).norm() < 0.2 && Predict_steps >= 2){
   //   cout << "control is too small!!!!!!!!" << endl;
   //   return;
@@ -1002,33 +980,15 @@ void timerCallback(const ros::TimerEvent &e)
   cmd.angular.z = u_k.col(0)(1);
   vel_cmd_pub.publish(cmd);
 
-
-  // fill ROS message for head control
-  trajectory_msgs::JointTrajectory head_traj;
   std_msgs::Float64 yaw_desire;
-  std_msgs::Float64 pitch_desire;
-
   // yaw_desire.data = abs(cur_cam_yaw) > 1.5708 ? u_k.col(0)(2) : -u_k.col(0)(2);
   yaw_desire.data = -u_k.col(0)(2);
+  g_yaw_cmd_pub.publish(yaw_desire);
+
+  std_msgs::Float64 pitch_desire;
   pitch_desire.data = -u_k.col(0)(3); // pitch控制：负值朝上运动
-
-  head_traj.joint_names.push_back("head_pan_joint");
-  head_traj.joint_names.push_back("head_tilt_joint");
-
-  head_traj.points.resize(1);
-
-  head_traj.points[0].positions.resize(2);
-  head_traj.points[0].velocities.resize(2);
-  head_traj.points[0].velocities[0] = yaw_desire.data;
-  head_traj.points[0].velocities[1] = pitch_desire.data;
-  // for (size_t i = 0; i < 2; ++i) {
-  //   head_traj.points[0].velocities[i] = 0.0;
-  // }
-  head_traj.points[0].time_from_start = ros::Duration(3.0);
-
-  // publish ROS message for head control
-  ROS_INFO("head_yaw_desire: %f, head_pitch_desire: %f", yaw_desire.data, pitch_desire.data);
-  g_yaw_pitch_cmd_pub.publish(head_traj);
+  // pitch_desire.data = 0;
+  g_pitch_cmd_pub.publish(pitch_desire);
 
   // Visualization of predict path
   trajectory_predict.poses.clear();
@@ -1121,7 +1081,6 @@ int main(int argc, char **argv)
   ros::NodeHandle n("mpc_test");
   ros::Rate loop_rate(500);
 
-  cout << "############################ mpc_test_node start ##############################" << endl;
   ros::Timer timer = n.createTimer(ros::Duration(dt), timerCallback);
 
 #if (def_Predefined_traj_TEST != 1)
@@ -1143,7 +1102,7 @@ int main(int argc, char **argv)
 #endif
   
   ros::Subscriber joint_state_sub = n.subscribe<sensor_msgs::JointState>(
-      "/hsrb/joint_states", 1, JointState_Cb);
+      "/joint_states", 1, JointState_Cb);
 
   NormVec_publisher = n.advertise<nav_msgs::Path> ("/visual_norm_vec", 1);
   Travel_Path_publisher = n.advertise<nav_msgs::Path> ("/Traveled_path", 1);
@@ -1153,7 +1112,7 @@ int main(int argc, char **argv)
   //  body_imu_callback);
 
   ros::Subscriber base_state_sub = n.subscribe<nav_msgs::Odometry>(
-      "/hsrb/odom_ground_truth", 1, BaseState_Cb);
+      "/ground_truth/base_state", 1, BaseState_Cb);
 
   ros::Subscriber HeightMap_sub =
   n.subscribe<nav_msgs::OccupancyGrid>("/Height_map_tracking", 1, HeightMapCb);
@@ -1173,37 +1132,11 @@ int main(int argc, char **argv)
   // vel_cmd_pub =
   //     n.advertise<geometry_msgs::Twist>("/plt_velocity_controller/cmd_vel", 1);
   vel_cmd_pub =
-      n.advertise<geometry_msgs::Twist>("/hsrb/command_velocity", 1);
-
-  
-  // make sure the hsr head controller is running
-  ros::ServiceClient client = n.serviceClient<controller_manager_msgs::ListControllers>(
-      "/hsrb/controller_manager/list_controllers");
-  controller_manager_msgs::ListControllers list_controllers;
-  bool running = false;
-  while (running == false) {
-    ros::Duration(0.1).sleep();
-    ROS_INFO("Waiting for HSR's head controller to start...");
-    if (client.call(list_controllers)) {
-      for (unsigned int i = 0; i < list_controllers.response.controller.size(); i++) {
-        controller_manager_msgs::ControllerState c = list_controllers.response.controller[i];
-        if (c.name == "head_trajectory_controller" && c.state == "running") {
-          running = true;
-          ROS_INFO("head controller is running");
-        }
-        else {
-          ROS_WARN("head controller is not running");
-        }
-      }
-    }
-  }
-  
-  g_yaw_pitch_cmd_pub = n.advertise<trajectory_msgs::JointTrajectory>("/hsrb/head_trajectory_controller/command", 10);
-  
-  // g_yaw_cmd_pub = n.advertise<std_msgs::Float64>(
-  //     "/joint11_velocity_controller/command", 1);
-  // g_pitch_cmd_pub = n.advertise<std_msgs::Float64>(
-  //     "/joint10_velocity_controller/command", 1);
+      n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+  g_yaw_cmd_pub = n.advertise<std_msgs::Float64>(
+      "/joint11_velocity_controller/command", 1);
+  g_pitch_cmd_pub = n.advertise<std_msgs::Float64>(
+      "/joint10_velocity_controller/command", 1);
 
   pub_reach_goal = n.advertise<std_msgs::Int16>(
       "/goal_reached", 1);
@@ -1216,7 +1149,7 @@ int main(int argc, char **argv)
   pub_terrain_map_1 =
       n.advertise<nav_msgs::OccupancyGrid>("Height_map_mpc", 5, true);
 
-  ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/my_move_base_simple/goal", 1, goalposeCallback);
+  ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1, goalposeCallback);
   // ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/aeplanner/setpoint_position/local", 1, goalposeCallback);
 
   plan_trajectory.header.frame_id = "/world";

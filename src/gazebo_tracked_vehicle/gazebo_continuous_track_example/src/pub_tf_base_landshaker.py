@@ -15,7 +15,7 @@ def Position_callback(odom_data):
     b_to_e = TransformStamped()
     b_to_e.header.stamp = rospy.Time.now()
     b_to_e.header.frame_id = "world"
-    b_to_e.child_frame_id = "gimbal_link"
+    b_to_e.child_frame_id = "head_pan_link"
     b_to_e.transform.translation.x = odom_data.pose.pose.position.x
     b_to_e.transform.translation.y = odom_data.pose.pose.position.y
     b_to_e.transform.translation.z = odom_data.pose.pose.position.z + 1.2

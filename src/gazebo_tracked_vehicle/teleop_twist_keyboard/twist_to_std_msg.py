@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from __future__ import print_function
 
@@ -74,7 +74,7 @@ if __name__=="__main__":
 
 
     rospy.init_node('twist_to_std_msg')
-    rospy.Subscriber('/cmd_vel', Twist, callback)
+    rospy.Subscriber('/hsrb/command_velocity', Twist, callback)
     rate = rospy.Rate(30)
     
     try:

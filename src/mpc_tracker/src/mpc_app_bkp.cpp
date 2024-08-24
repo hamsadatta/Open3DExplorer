@@ -37,10 +37,10 @@
 #define PI 3.1415926
 // #define N 10
 
-// !One of the following three must be 1
-#define def_Predefined_traj_TEST 1    // Set endpoint tracking through movebase_goal
-#define def_Insert_Traj 0   // Track rrt planning results
-#define SetValue_TEST 0   // Numerical simulation test
+// !下列三个中必须有一个为1
+#define def_Predefined_traj_TEST 0    // 通过movebase_goal设定终点的跟踪
+#define def_Insert_Traj 0   // 对rrt规划结果进行跟踪
+#define SetValue_TEST 0   // 数值仿真测试
 
 #define def_USING_ORBSLAM 1
 
@@ -214,7 +214,6 @@ double cur_cam_yaw_last;
 bool b_received_pose = false;
 void orbpose_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
 {
-  cout << "############################ orbpose_callback ##############################" << endl;
   ROS_INFO("Entered Orbslam pose Callback...");
   tf::Quaternion quat;
   tf::quaternionMsgToTF(msg->pose.orientation, quat);
@@ -240,7 +239,7 @@ void orbpose_callback(const geometry_msgs::PoseStamped::ConstPtr &msg)
   geometry_msgs::PoseStamped pose_msg;
   std_msgs::Header header;
   header.stamp = ros::Time::now();
-  header.frame_id = "world";
+  header.frame_id = "/world";
 
   Travel_Path_visualization.header = msg->header;
   // orb_path_.header.frame_id = map_frame_id_param_;
@@ -273,7 +272,6 @@ void body_imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
 tf::Quaternion quat_camera_cb;
 void CameraState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 {
-  cout << "############################ CameraState_Cb ##############################" << endl;
   // cout << "msg->pose.pose.orientation: " << msg->pose.pose.orientation << endl;
   tf::quaternionMsgToTF(msg->pose.pose.orientation, quat_camera_cb);
 
@@ -317,7 +315,7 @@ void CameraState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
   geometry_msgs::PoseStamped pose_msg;
   std_msgs::Header header;
   header.stamp = ros::Time::now();
-  header.frame_id = "world";
+  header.frame_id = "/world";
   Travel_Path_visualization.header = msg->header;
   // orb_path_.header.frame_id = map_frame_id_param_;
   pose_msg.pose.position = msg->pose.pose.position;
@@ -335,7 +333,6 @@ void CameraState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 
 double pitch_base2cam, yaw_base2cam;
 void JointState_Cb(const sensor_msgs::JointState::ConstPtr &msg){
-  cout << "############################ JointState_Cb ##############################" << endl;
   pitch_base2cam = -msg->position[10];
   yaw_base2cam = -msg->position[9];
   cout << "joint_state pitch: " << pitch_base2cam << " yaw_state: " << yaw_base2cam << endl;
@@ -344,7 +341,6 @@ void JointState_Cb(const sensor_msgs::JointState::ConstPtr &msg){
 bool enter_basestate_cb = false;
 void BaseState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 {
-  cout << "############################ BaseState_Cb ##############################" << endl;
   tf::Quaternion quat;
   tf::quaternionMsgToTF(msg->pose.pose.orientation, quat);
   // tf::Matrix3x3(quat).getRPY(cur_base_pitch, cur_base_roll, 
@@ -376,7 +372,6 @@ void BaseState_Cb(const nav_msgs::Odometry::ConstPtr &msg)
 bool heightmap_initialed = false;
 void HeightMapCb(const nav_msgs::OccupancyGrid::ConstPtr &msg)
 {
-  cout << "############################ HeightMapCb ##############################" << endl;
   Height_map.header = msg->header;
   Height_map.info = msg->info;
   ROS_INFO("Got map %d %d", Height_map.info.width, Height_map.info.height);
@@ -399,7 +394,6 @@ bool rrt_update = false;
 bool rrt_initialed = false;
 void rrtpath_callback(const nav_msgs::Path::ConstPtr &msg)
 {
-  cout << "############################ rrtpath_callback ##############################" << endl;
   ROS_INFO("Enter rrt path callback.");
   if (!b_received_pose)
   {
@@ -540,7 +534,6 @@ std_msgs::Int16 _reached;
 static int goal_cb_count = 0;
 void goalposeCallback(const geometry_msgs::PoseStampedConstPtr &waypoint)
 {
-  cout << "############################ goalposeCallback ##############################" << endl;
   if(!f_goal_reached && goal_cb_count!=0)
     return;
   
@@ -577,7 +570,6 @@ void goalposeCallback(const geometry_msgs::PoseStampedConstPtr &waypoint)
 }
 
 bool Reach_Goal_func(){
-  cout << "############################ Reach_Goal_func ##############################" << endl;
   float _reach_pos_eps = 4;
   // float _reach_pos_eps = 1;
   float _reach_rot_eps = 0.3;
@@ -609,7 +601,7 @@ bool Reach_Goal_func(){
 
 void Predefined_Trajectory()
 {
-  cout << "############################ Predefined_Trajectory ##############################" << endl;
+
   Waypoints_rrt.clear();
 
   Eigen::VectorXd _waypoint(6);
@@ -691,7 +683,6 @@ bool init_predefine_traj = false;
 static int goal_set_count = 0;
 void timerCallback(const ros::TimerEvent &e)
 {
-  cout << "############################ timerCallback ##############################" << endl;
   ros::Time t1 = ros::Time::now();
   double t_cur = t1.toSec(); //获取的是自1970年一月一日到现在时刻的秒数
   printf("The time is: %16f\n",
@@ -989,7 +980,7 @@ void timerCallback(const ros::TimerEvent &e)
   // returns [steering_angle, acceleration]
   u_k = mpc.Solve(state, ref_wp, Predict_steps);  
   ROS_INFO("MPC solved");
-  
+
   // if(u_k.col(0).norm() < 0.2 && Predict_steps >= 2){
   //   cout << "control is too small!!!!!!!!" << endl;
   //   return;
@@ -1216,7 +1207,7 @@ int main(int argc, char **argv)
   pub_terrain_map_1 =
       n.advertise<nav_msgs::OccupancyGrid>("Height_map_mpc", 5, true);
 
-  ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/my_move_base_simple/goal", 1, goalposeCallback);
+  ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/move_base_simple/goal", 1, goalposeCallback);
   // ros::Subscriber goalpoint_sub_ = n.subscribe<geometry_msgs::PoseStamped>("/aeplanner/setpoint_position/local", 1, goalposeCallback);
 
   plan_trajectory.header.frame_id = "/world";
